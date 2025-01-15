@@ -97,4 +97,4 @@ This roadmap outlines the steps to develop the frontend of a Managed Game Boosti
   - Grandmaster III to Grandmaster I
   - Celestial III to Celestial I
   - Eternity
-  - One Above All
+  - One Above All 

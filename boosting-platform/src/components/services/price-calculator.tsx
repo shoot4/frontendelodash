@@ -3,16 +3,16 @@
 import { FC, useState } from 'react'
 import { Rank } from '@/lib/ranks'
 import { priceCalculator, BoostingOptions } from '@/lib/price-calculator'
-import { Switch } from '../ui/switch'
-import { Button } from '../ui/button'
-import { Slider } from '../ui/slider'
+import { Switch } from "@/components/ui/switch"
+import { Button } from "@/components/ui/button"
+import { Slider } from "@/components/ui/slider"
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '../ui/select'
+} from "@/components/ui/select"
 import {
   Card,
   CardContent,
@@ -20,13 +20,13 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from '../ui/card'
+} from "@/components/ui/card"
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "../ui/accordion"
+} from "@/components/ui/accordion"
 import CharacterSelector from './character-selector'
 
 interface PriceCalculatorProps {

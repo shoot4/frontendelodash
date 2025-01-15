@@ -1,9 +1,9 @@
 "use client"
 
-import { ServiceCategory, SortOption } from "@/types/service"
-import { Button } from "../ui/button"
 import { useState } from "react"
-import { Rank, RANKS, formatRank } from "@/lib/ranks"
+import { Search } from "lucide-react"
+import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
 import {
   Select,
   SelectContent,
@@ -12,185 +12,164 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Slider } from "@/components/ui/slider"
-import { rankUtils } from '@/lib/rank-utils'
-import { toast } from 'react-hot-toast'
+import { RankTier } from "@/types/calculator"
 
 interface ServiceFiltersProps {
-  onCategoryChange: (category: ServiceCategory | 'all') => void
-  onSortChange: (sort: SortOption) => void
+  onCategoryChange: (category: string) => void
+  onSortChange: (sort: string) => void
   onSearchChange: (search: string) => void
   onPriceRangeChange: (range: [number, number]) => void
-  onRankChange: (from: Rank, to: Rank) => void
+  onRankChange: (rank: RankTier) => void
 }
 
-const ServiceFilters: React.FC<ServiceFiltersProps> = ({
+const categories = [
+  { value: "all", label: "All Services" },
+  { value: "ranked", label: "Rank Boost" },
+  { value: "coaching", label: "Coaching" },
+  { value: "training", label: "Character Training" },
+]
+
+const sortOptions = [
+  { value: "price-asc", label: "Price: Low to High" },
+  { value: "price-desc", label: "Price: High to Low" },
+  { value: "popularity", label: "Most Popular" },
+  { value: "newest", label: "Newest" },
+]
+
+const rankTiers: RankTier[] = [
+  "Bronze",
+  "Silver",
+  "Gold",
+  "Platinum",
+  "Diamond",
+  "Grandmaster",
+  "Celestial",
+  "Eternity",
+  "One Above All"
+]
+
+export function ServiceFilters({
   onCategoryChange,
   onSortChange,
   onSearchChange,
   onPriceRangeChange,
   onRankChange,
-}) => {
-  const [activeCategory, setActiveCategory] = useState<ServiceCategory | 'all'>('all')
-  const [activeSort, setActiveSort] = useState<SortOption>('popularity')
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 500])
-  const [fromRank, setFromRank] = useState<Rank>(RANKS[0])
-  const [toRank, setToRank] = useState<Rank>(RANKS[RANKS.length - 1])
+}: ServiceFiltersProps) {
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 100])
+  const [searchQuery, setSearchQuery] = useState("")
 
-  const categories: (ServiceCategory | 'all')[] = ['all', 'Ranking', 'Leveling', 'Achievements', 'Coaching']
-  const sortOptions: { value: SortOption; label: string }[] = [
-    { value: 'price-asc', label: 'Price: Low to High' },
-    { value: 'price-desc', label: 'Price: High to Low' },
-    { value: 'popularity', label: 'Most Popular' },
-    { value: 'newest', label: 'Newest' },
-  ]
+  const handleSearch = (value: string) => {
+    setSearchQuery(value)
+    onSearchChange(value)
+  }
 
-  const handlePriceRangeChange = (value: number[]) => {
+  const handlePriceChange = (value: number[]) => {
     const range: [number, number] = [value[0], value[1]]
     setPriceRange(range)
     onPriceRangeChange(range)
   }
 
-  const handleFromRankChange = (rankStr: string) => {
-    const [tier, division] = rankStr.split(' ')
-    const newFromRank: Rank = { 
-      tier: tier as Rank['tier'], 
-      division: division as Rank['division'] 
-    }
-    
-    // Validate rank progression
-    if (toRank && !rankUtils.isValidProgression(newFromRank, toRank)) {
-      toast.error("Starting rank must be lower than target rank")
-      return
-    }
-
-    setFromRank(newFromRank)
-    onRankChange(newFromRank, toRank)
-  }
-
-  const handleToRankChange = (rankStr: string) => {
-    const [tier, division] = rankStr.split(' ')
-    const newToRank: Rank = { 
-      tier: tier as Rank['tier'], 
-      division: division as Rank['division'] 
-    }
-    
-    // Validate rank progression
-    if (fromRank && !rankUtils.isValidProgression(fromRank, newToRank)) {
-      toast.error("Target rank must be higher than starting rank")
-      return
-    }
-
-    setToRank(newToRank)
-    onRankChange(fromRank, newToRank)
-  }
-
   return (
     <div className="space-y-6">
       {/* Search */}
-      <div>
-        <input
-          type="text"
-          placeholder="Search services..."
-          onChange={(e) => onSearchChange(e.target.value)}
-          className="w-full rounded-md border bg-background px-3 py-2"
-        />
+      <div className="space-y-2">
+        <h3 className="text-sm font-medium">Search</h3>
+        <div className="relative">
+          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search services..."
+            className="pl-8"
+            value={searchQuery}
+            onChange={(e) => handleSearch(e.target.value)}
+          />
+        </div>
       </div>
 
-      {/* Categories */}
-      <div className="flex flex-wrap gap-2">
-        {categories.map((category) => (
-          <Button
-            key={category}
-            variant={activeCategory === category ? "default" : "outline"}
-            onClick={() => {
-              setActiveCategory(category)
-              onCategoryChange(category)
-            }}
-            className="capitalize"
-          >
-            {category}
-          </Button>
-        ))}
+      {/* Category Filter */}
+      <div className="space-y-2">
+        <h3 className="text-sm font-medium">Category</h3>
+        <Select onValueChange={onCategoryChange}>
+          <SelectTrigger>
+            <SelectValue placeholder="Select category" />
+          </SelectTrigger>
+          <SelectContent>
+            {categories.map((category) => (
+              <SelectItem key={category.value} value={category.value}>
+                {category.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
-      {/* Rank Selection */}
-      <div className="grid gap-4 sm:grid-cols-2">
-        <div className="space-y-2">
-          <label className="text-sm font-medium">From Rank</label>
-          <Select
-            value={`${fromRank.tier}${fromRank.division ? ` ${fromRank.division}` : ''}`}
-            onValueChange={handleFromRankChange}
-          >
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {RANKS.map((rank) => (
-                <SelectItem
-                  key={formatRank(rank)}
-                  value={formatRank(rank)}
-                >
-                  {formatRank(rank)}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="space-y-2">
-          <label className="text-sm font-medium">To Rank</label>
-          <Select
-            value={`${toRank.tier}${toRank.division ? ` ${toRank.division}` : ''}`}
-            onValueChange={handleToRankChange}
-          >
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {RANKS.map((rank) => (
-                <SelectItem
-                  key={formatRank(rank)}
-                  value={formatRank(rank)}
-                >
-                  {formatRank(rank)}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+      {/* Sort */}
+      <div className="space-y-2">
+        <h3 className="text-sm font-medium">Sort By</h3>
+        <Select onValueChange={onSortChange}>
+          <SelectTrigger>
+            <SelectValue placeholder="Sort by" />
+          </SelectTrigger>
+          <SelectContent>
+            {sortOptions.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
       {/* Price Range */}
-      <div className="space-y-2">
-        <label className="text-sm font-medium">Price Range: ${priceRange[0]} - ${priceRange[1]}</label>
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h3 className="text-sm font-medium">Price Range</h3>
+          <span className="text-sm text-muted-foreground">
+            ${priceRange[0]} - ${priceRange[1]}
+          </span>
+        </div>
         <Slider
           min={0}
-          max={500}
-          step={10}
-          value={priceRange}
-          onValueChange={handlePriceRangeChange}
+          max={100}
+          step={5}
+          value={[priceRange[0], priceRange[1]]}
+          onValueChange={handlePriceChange}
+          className="w-full"
         />
       </div>
 
-      {/* Sort Options */}
-      <div className="flex items-center gap-2">
-        <span className="text-sm text-muted-foreground">Sort by:</span>
-        {sortOptions.map((option) => (
-          <Button
-            key={option.value}
-            variant={activeSort === option.value ? "default" : "outline"}
-            onClick={() => {
-              setActiveSort(option.value)
-              onSortChange(option.value)
-            }}
-            size="sm"
-          >
-            {option.label}
-          </Button>
-        ))}
+      {/* Rank Filter */}
+      <div className="space-y-2">
+        <h3 className="text-sm font-medium">Minimum Rank Required</h3>
+        <Select onValueChange={(value) => onRankChange(value as RankTier)}>
+          <SelectTrigger>
+            <SelectValue placeholder="Select rank" />
+          </SelectTrigger>
+          <SelectContent>
+            {rankTiers.map((rank) => (
+              <SelectItem key={rank} value={rank}>
+                {rank}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
+
+      {/* Reset Filters */}
+      <Button
+        variant="outline"
+        className="w-full"
+        onClick={() => {
+          setSearchQuery("")
+          setPriceRange([0, 100])
+          onSearchChange("")
+          onCategoryChange("all")
+          onSortChange("popularity")
+          onPriceRangeChange([0, 100])
+          onRankChange("Bronze")
+        }}
+      >
+        Reset Filters
+      </Button>
     </div>
   )
-}
-
-export default ServiceFilters 
+} 

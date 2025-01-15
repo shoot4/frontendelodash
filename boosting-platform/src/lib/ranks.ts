@@ -13,7 +13,7 @@ export type RankDivision = 'III' | 'II' | 'I'
 
 export interface Rank {
   tier: RankTier
-  division?: RankDivision // Optional because Eternity and One Above All don't have divisions
+  division: RankDivision // Always required, Eternity and One Above All will use 'I'
 }
 
 export const RANKS: Rank[] = [
@@ -38,8 +38,8 @@ export const RANKS: Rank[] = [
   { tier: 'Celestial', division: 'III' },
   { tier: 'Celestial', division: 'II' },
   { tier: 'Celestial', division: 'I' },
-  { tier: 'Eternity' },
-  { tier: 'One Above All' }
+  { tier: 'Eternity', division: 'I' },
+  { tier: 'One Above All', division: 'I' }
 ]
 
 export const getRankValue = (rank: Rank): number => {
@@ -52,19 +52,19 @@ export const getRankValue = (rank: Rank): number => {
     'Grandmaster': 15,
     'Celestial': 18,
     'Eternity': 21,
-    'One Above All': 22
+    'One Above All': 24
   }
 
   const baseValue = tierValues[rank.tier]
-  if (!rank.division) return baseValue
-
   const divisionValue = 2 - ['III', 'II', 'I'].indexOf(rank.division)
   
   return baseValue + divisionValue
 }
 
 export const formatRank = (rank: Rank): string => {
-  if (!rank.division) return rank.tier
+  if (rank.tier === 'Eternity' || rank.tier === 'One Above All') {
+    return rank.tier
+  }
   return `${rank.tier} ${rank.division}`
 }
 

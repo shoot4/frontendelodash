@@ -7,13 +7,7 @@ export interface Service {
   id: string
   title: string
   description: string
-  category: ServiceCategory
-  features: string[]
+  price: string
+  category: 'ranked' | 'unranked' | 'coaching' | 'other'
   image: string
-  price: number
-  isNew?: boolean
-  isPopular?: boolean
-  estimatedTime: string
-  fromRank?: Rank
-  toRank?: Rank
 } 

@@ -1,14 +1,16 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import Header from "@/components/layout/header";
-import Footer from "@/components/layout/footer";
+import { Navbar } from "@/components/layout/navbar";
+import { Footer } from "@/components/layout/footer";
+import { Toaster } from "react-hot-toast";
+import { LiveChat } from "@/components/chat/live-chat";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Game Boosting Platform",
-  description: "Professional game boosting services for Marvel Rivals",
+  title: "Marvel Rivals Boosting",
+  description: "Professional Marvel Rivals rank boosting services",
 };
 
 export default function RootLayout({
@@ -19,11 +21,15 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <Header />
-        <main className="min-h-screen">
-          {children}
-        </main>
-        <Footer />
+        <div className="min-h-screen flex flex-col">
+          <Navbar />
+          <main className="flex-grow">
+            {children}
+          </main>
+          <Footer />
+        </div>
+        <LiveChat />
+        <Toaster position="bottom-right" />
       </body>
     </html>
   );

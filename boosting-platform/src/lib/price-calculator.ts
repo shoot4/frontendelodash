@@ -1,5 +1,43 @@
-import { Rank, getRankValue } from './ranks'
-import { rankUtils } from './rank-utils'
+import { Rank, RankTier } from "@/types/calculator"
+import { Character } from './characters'
+
+const RANK_VALUES: Record<RankTier, number> = {
+  "Bronze": 0,
+  "Silver": 3,
+  "Gold": 6,
+  "Platinum": 9,
+  "Diamond": 12,
+  "Grandmaster": 15,
+  "Celestial": 18,
+  "Eternity": 21,
+  "One Above All": 24
+}
+
+const DIVISION_VALUES = {
+  "III": 0,
+  "II": 1,
+  "I": 2
+}
+
+export const calculateBasePrice = (currentRank: Rank, desiredRank: Rank): number => {
+  // Validate ranks
+  if ((currentRank.tier === "Eternity" || currentRank.tier === "One Above All") && 
+      currentRank.division !== "I") {
+    throw new Error(`${currentRank.tier} can only have division I`)
+  }
+  if ((desiredRank.tier === "Eternity" || desiredRank.tier === "One Above All") && 
+      desiredRank.division !== "I") {
+    throw new Error(`${desiredRank.tier} can only have division I`)
+  }
+
+  const currentValue = RANK_VALUES[currentRank.tier] + DIVISION_VALUES[currentRank.division]
+  const desiredValue = RANK_VALUES[desiredRank.tier] + DIVISION_VALUES[desiredRank.division]
+  const rankDifference = desiredValue - currentValue
+
+  // Base price calculation
+  const basePrice = rankDifference * 10 // $10 per rank step
+  return Math.max(basePrice, 0)
+}
 
 export interface BoostingOptions {
   // Basic Options
@@ -9,7 +47,7 @@ export interface BoostingOptions {
   streamingRights: boolean
   
   // Game-Specific Options
-  preferredCharacters: string[] // Selected Marvel characters
+  preferredCharacters: Character[] // Selected Marvel characters
   specificPlaytime: boolean // Play during specific hours
   duoQueue: boolean // Play with a second booster
   winRate: 'normal' | 'high' // Guaranteed win rate option
@@ -24,7 +62,7 @@ export interface BoostingOptions {
 
 export const priceCalculator = {
   calculatePrice: (fromRank: Rank, toRank: Rank, options: Partial<BoostingOptions> = {}): number => {
-    const basePrice = rankUtils.calculateBasePrice(fromRank, toRank)
+    const basePrice = calculateBasePrice(fromRank, toRank)
     let finalPrice = basePrice
 
     // Basic Options Multipliers
@@ -60,7 +98,7 @@ export const priceCalculator = {
     additionalCosts: { label: string; amount: number }[]
     totalPrice: number
   } => {
-    const basePrice = rankUtils.calculateBasePrice(fromRank, toRank)
+    const basePrice = calculateBasePrice(fromRank, toRank)
     const additionalCosts: { label: string; amount: number }[] = []
     let totalPrice = basePrice
 

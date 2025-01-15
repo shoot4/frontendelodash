@@ -10,19 +10,19 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
-} from "../ui/dialog"
-import { Button } from '../ui/button'
-import { Badge } from '../ui/badge'
-import { ScrollArea } from '../ui/scroll-area'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs'
-import { Input } from '../ui/input'
+  DialogTrigger
+} from "@/components/ui/dialog"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Input } from "@/components/ui/input"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuCheckboxItem,
   DropdownMenuTrigger,
-} from "../ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu"
 
 interface CharacterSelectorProps {
   selectedCharacters: Character[]
@@ -134,7 +134,7 @@ const CharacterSelector: FC<CharacterSelectorProps> = ({
                 id="character-search"
                 placeholder="Search characters..."
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
                 className="pl-9"
               />
             </div>
@@ -150,7 +150,7 @@ const CharacterSelector: FC<CharacterSelectorProps> = ({
                   <DropdownMenuCheckboxItem
                     key={role}
                     checked={selectedRoles.includes(role)}
-                    onCheckedChange={(checked) => {
+                    onCheckedChange={(checked: boolean) => {
                       setSelectedRoles(prev => 
                         checked 
                           ? [...prev, role]
@@ -168,7 +168,7 @@ const CharacterSelector: FC<CharacterSelectorProps> = ({
           <Tabs 
             defaultValue="Vanguard" 
             value={activeTab}
-            onValueChange={(value) => setActiveTab(value as CharacterRole)}
+            onValueChange={(value: string) => setActiveTab(value as CharacterRole)}
             className="w-full"
           >
             <TabsList className="grid w-full grid-cols-3">
@@ -182,7 +182,7 @@ const CharacterSelector: FC<CharacterSelectorProps> = ({
                 <TabsContent 
                   key={role} 
                   value={role}
-                  onKeyDown={(e) => handleKeyDown(e, filteredCharacters)}
+                  onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => handleKeyDown(e, filteredCharacters)}
                 >
                   {filteredCharacters.length === 0 ? (
                     <div className="flex h-[300px] items-center justify-center text-muted-foreground">
